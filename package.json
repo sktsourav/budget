@@ -1,0 +1,18 @@
+{
+  "name": "budget-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "author": "SKT",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/postgres": "^5.2.2",
+    "fastify": "^4.28.1",
+    "pg": "^8.12.0"
+  }
+}
