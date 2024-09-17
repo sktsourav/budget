@@ -1,4 +1,4 @@
-import { fetchAllUsers, addNewUser, getUser, checkForDuplicateUsername, checkforDuplicateId, loginUser } from "../db/users.js";
+import { fetchAllUsers, addNewUser, getUser, checkForDuplicateUsername, checkforDuplicateId, loginUser, recordloginSession } from "../db/users.js";
 import { generateId } from "../helper/index.js"
 import bcrypt from "bcrypt";
 const saltRounds = 10;
@@ -48,7 +48,7 @@ export const loginController = async (req, res) => {
     try {
         const { username, password } = req.body;
         const userDetails = await loginUser(res, username);
-        await verifyUserCredential(res, password, userDetails[0].password)
+        await verifyUserCredential(res, password, userDetails[0])
     } catch (error) {
         res.send({
             error: error.stack,
@@ -57,9 +57,11 @@ export const loginController = async (req, res) => {
     }
 }
 
-const verifyUserCredential = async (res, inputPassword, password) => {
-    const match = await bcrypt.compare(inputPassword, password);
+const verifyUserCredential = async (res, inputPassword, userDetails) => {
+    const match = await bcrypt.compare(inputPassword, userDetails.password);
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
     if (match === true) {
+        await recordloginSession(res, userDetails.username, userDetails.id, "ajdwqduwqhs2132312312", new Date(), token)
         res.send({
             statusCode: 200,
             message: "LOGGED IN SUCCESSFULLY"

@@ -88,6 +88,8 @@ export const loginUser = (res, username) => {
             res.send({
                 error: error
             })
+        } finally {
+            client.release();
         }
     })
 }
@@ -120,6 +122,29 @@ export const checkforDuplicateId = (id) => {
             resolve(result);
         } catch (error) {
             reject(error.stack);
+        } finally {
+            client.release();
+        }
+    })
+}
+
+export const recordloginSession = (res, username, id, sessionId, loginTime, token) => {
+    return new Promise(async (resolve, reject) => {
+        const client = await fastify.pg.connect();
+        try {
+            const result = await client.query(
+                'INSERT INTO internal.usersession (username, id, sessionid, logintime, token) VALUES ($1, $2, $3, $4, $5)', [username, id, sessionId, loginTime, token]
+            )
+            if (result.rowCount === 1) {
+                console.log("Session active");
+                resolve(true)
+            } else {
+                reject(false)
+            }
+        } catch (error) {
+            res.send({
+                errorss: error
+            })
         } finally {
             client.release();
         }
