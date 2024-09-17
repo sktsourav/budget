@@ -19,8 +19,8 @@ export const fetchAllUsers = async (req, res) => {
     }
 }
 
-export const addNewUser = async (req, res, date, id) => {
-    const { name, username, password } = req.body;
+export const addNewUser = async (req, res, date, id, username) => {
+    const { name, password } = req.body;
     const client = await fastify.pg.connect();
     try {
         const result = await client.query(
