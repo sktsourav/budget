@@ -1,14 +1,24 @@
-import { fetchAllUsers, addNewUser, getUser } from "../db/users.js"
+import { fetchAllUsers, addNewUser, getUser, checkForDuplicateUsername, checkforDuplicateId } from "../db/users.js"
+import { generateId } from "../helper/index.js"
 
 export const fetchAllUsersController = (req, res) => {
     fetchAllUsers(req, res);
 }
 
-export const addNewUserController = (req, res) => {
+export const addNewUserController = async (req, res) => {
     try {
         const date = new Date();
-        const { name, id, username, password } = req.body;
-        addNewUser(req, res, id, name, date, username, password);
+        const { username } = req.body;
+        const id = "USER" + await generateId(checkforDuplicateId, 1000000000);
+        const user = await checkForDuplicateUsername(username);
+
+        if (user?.rows?.length > 0) {
+            res.send({
+                message: "This username is already in use."
+            })
+        } else {
+            await addNewUser(req, res, date, id);
+        }
     } catch (error) {
         res.send({
             error: error.stack,
