@@ -47,12 +47,12 @@ export const addNewUser = async (req, res, date, id) => {
     }
 }
 
-export const getUser = async (req, res, id) => {
+export const getUser = async (req, res, username) => {
     const client = await fastify.pg.connect();
     try {
         const result = await client.query(
-            'SELECT * FROM internal.users where id=$1',
-            [id]
+            'SELECT name, id, username FROM internal.users where username=$1',
+            [username]
         )
         res.send({
             result: result?.rows

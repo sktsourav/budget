@@ -29,8 +29,20 @@ export const addNewUserController = async (req, res) => {
 
 export const getUserController = (req, res) => {
     try {
-        const id = req.body.id;
-        getUser(req, res, id);
+        const username = req.body.username;
+        getUser(req, res, username);
+    } catch (error) {
+        res.send({
+            error: error.stack,
+            message: error.message
+        })
+    }
+}
+
+export const loginController = (req, res) => {
+    try {
+        const { username, password } = req.body;
+        
     } catch (error) {
         res.send({
             error: error.stack,
