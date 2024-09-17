@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@fastify/postgres": "^5.2.2",
+    "bcrypt": "^5.1.1",
     "fastify": "^4.28.1",
     "pg": "^8.12.0"
   }

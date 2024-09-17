@@ -19,8 +19,8 @@ export const fetchAllUsers = async (req, res) => {
     }
 }
 
-export const addNewUser = async (req, res, date, id, username) => {
-    const { name, password } = req.body;
+export const addNewUser = async (req, res, date, id, password) => {
+    const { name, username } = req.body;
     const client = await fastify.pg.connect();
     try {
         const result = await client.query(
@@ -66,6 +66,30 @@ export const getUser = async (req, res, username) => {
     finally {
         client.release();
     }
+}
+
+export const loginUser = (res, username) => {
+    return new Promise(async (resolve, reject) => {
+        const client = await fastify.pg.connect();
+        try {
+            const user = await client.query('SELECT * FROM internal.users where username=$1',
+                [username]
+            )
+            if (user?.rows.length > 0) {
+                resolve(user.rows)
+            } else {
+                res.send({
+                    statusCode: 404,
+                    message: "INVALID USERNAME OR PASSWORD"
+                })
+            }
+
+        } catch (error) {
+            res.send({
+                error: error
+            })
+        }
+    })
 }
 
 export const checkForDuplicateUsername = (username) => {

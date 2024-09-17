@@ -1,7 +1,8 @@
 import {
     addNewUserController,
     fetchAllUsersController,
-    getUserController
+    getUserController,
+    loginController
 } from './controller/usersController.js';
 import testAPI from './controller/testController.js';
 import { addItemController, getItemsByIdController } from './controller/listController.js';
@@ -22,6 +23,8 @@ const routes = async (fastify, options) => {
     fastify.post("/addListItem", (req, res) => addItemController(req, res))
 
     fastify.post("/getItemsById", (req, res) => getItemsByIdController(req, res))
+
+    fastify.post("/login", (req, res) => loginController(req, res))
 }
 
 export default routes
