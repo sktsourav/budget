@@ -19,16 +19,23 @@ export const fetchAllUsers = async (req, res) => {
     }
 }
 
-export const addNewUser = async (req, res, id, name, date, username, password) => {
+export const addNewUser = async (req, res, date, id) => {
+    const { name, username, password } = req.body;
     const client = await fastify.pg.connect();
     try {
-        await checkUsername(username)
         const result = await client.query(
             'INSERT INTO internal.users (id, name, date, username, password) VALUES ($1, $2, $3, $4, $5)', [id, name, date, username, password]
         )
-        res.send({
-            result: result
-        })
+        if (result.rowCount === 1) {
+            console.log("User added successfully");
+            res.send({
+                message: "You have successfully signed up",
+            })
+        } else {
+            res.send({
+                message: "Sign up failed"
+            })
+        }
     } catch (err) {
         res.send({
             message: err.message,
@@ -61,13 +68,30 @@ export const getUser = async (req, res, id) => {
     }
 }
 
-export const checkUsername = (username) => {
+export const checkForDuplicateUsername = (username) => {
     return new Promise(async (resolve, reject) => {
         const client = await fastify.pg.connect();
         try {
             const result = await client.query(
                 'SELECT * FROM internal.users where username=$1',
                 [username]
+            )
+            resolve(result);
+        } catch (error) {
+            reject(error.stack);
+        } finally {
+            client.release();
+        }
+    })
+}
+
+export const checkforDuplicateId = (id) => {
+    return new Promise(async (resolve, reject) => {
+        const client = await fastify.pg.connect();
+        try {
+            const result = await client.query(
+                'SELECT * FROM internal.users where id=$1',
+                [id]
             )
             resolve(result);
         } catch (error) {

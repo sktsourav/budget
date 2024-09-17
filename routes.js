@@ -15,7 +15,7 @@ const routes = async (fastify, options) => {
 
     fastify.get('/fetchAllUsers', (req, res) => fetchAllUsersController(req, res))
 
-    fastify.post("/addUser", (req, res) => addNewUserController(req, res))
+    fastify.post("/signup", (req, res) => addNewUserController(req, res))
 
     fastify.post("/getUser", (req, res) => getUserController(req, res))
 
