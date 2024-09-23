@@ -133,7 +133,7 @@ export const recordloginSession = (res, username, id, sessionId, loginTime, toke
         const client = await fastify.pg.connect();
         try {
             const result = await client.query(
-                'INSERT INTO internal.usersession (username, id, sessionid, logintime, token) VALUES ($1, $2, $3, $4, $5)', [username, id, sessionId, loginTime, token]
+                'INSERT INTO internal.usersession (username, id, sessionid, logintime, token, activesession) VALUES ($1, $2, $3, $4, $5, $6)', [username, id, sessionId, loginTime, token, true]
             )
             if (result.rowCount === 1) {
                 console.log("Session active");
@@ -145,6 +145,23 @@ export const recordloginSession = (res, username, id, sessionId, loginTime, toke
             res.send({
                 errorss: error
             })
+        } finally {
+            client.release();
+        }
+    })
+}
+
+export const checkforDuplicateSessionId = (id) => {
+    return new Promise(async (resolve, reject) => {
+        const client = await fastify.pg.connect();
+        try {
+            const result = await client.query(
+                'SELECT * FROM internal.usersession where sessionid=$1',
+                [id]
+            )
+            resolve(result);
+        } catch (error) {
+            reject(error.stack);
         } finally {
             client.release();
         }

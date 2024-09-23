@@ -1,4 +1,4 @@
-import { fetchAllUsers, addNewUser, getUser, checkForDuplicateUsername, checkforDuplicateId, loginUser, recordloginSession } from "../db/users.js";
+import { fetchAllUsers, addNewUser, getUser, checkForDuplicateUsername, checkforDuplicateId, loginUser, recordloginSession, checkforDuplicateSessionId } from "../db/users.js";
 import { generateId } from "../helper/index.js"
 import bcrypt from "bcrypt";
 const saltRounds = 10;
@@ -59,9 +59,10 @@ export const loginController = async (req, res) => {
 
 const verifyUserCredential = async (res, inputPassword, userDetails) => {
     const match = await bcrypt.compare(inputPassword, userDetails.password);
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+    const token = "eyJhbGciOiJIUcCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3IiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwp_adQssw5c"
     if (match === true) {
-        await recordloginSession(res, userDetails.username, userDetails.id, "ajdwqduwqhs2132312312", new Date(), token)
+        const sessionId = "SESSION" + await generateId(checkforDuplicateSessionId, 100000000000);
+        await recordloginSession(res, userDetails.username, userDetails.id, sessionId, new Date(), token)
         res.send({
             statusCode: 200,
             message: "LOGGED IN SUCCESSFULLY"
