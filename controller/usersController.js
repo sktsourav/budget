@@ -2,6 +2,7 @@ import { fetchAllUsers, addNewUser, getUser, checkForDuplicateUsername, checkfor
 import { generateId } from "../helper/index.js"
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
+import { constants } from "../utils/constants.js";
 const saltRounds = 10;
 
 export const fetchAllUsersController = (req, res) => {
@@ -19,7 +20,7 @@ export const addNewUserController = (req, res) => {
 
             if (user?.rows?.length > 0) {
                 res.send({
-                    message: "This username is already in use."
+                    message: constants.DUPLICATEUSERNAME
                 })
             } else {
                 await addNewUser(req, res, date, id, hash);
@@ -64,18 +65,19 @@ const verifyUserCredential = async (res, inputPassword, userDetails) => {
         const token = await jwt.sign({
             "username": userDetails.username,
             "name": userDetails.name
-        }, 'ABCXYZSECRETS', { expiresIn: 60 * 60, algorithm: "HS256" });
+        }, constants.JWTSECRET, { expiresIn: constants.JWTEXPIRY, algorithm: constants.JWTALGO });
 
-        const sessionId = "SESSION" + await generateId(checkforDuplicateSessionId, 100000000000);
+        const sessionId = constants.SESSION + await generateId(checkforDuplicateSessionId, 100000000000);
         await recordloginSession(res, userDetails.username, userDetails.id, sessionId, new Date(), token)
         res.send({
-            statusCode: 200,
-            message: "LOGGED IN SUCCESSFULLY"
+            statusCode: constants.SUCCESSCODE,
+            message: constants.LOGINSUCCESS,
+            token: token
         })
     } else {
         res.send({
             statusCode: 401,
-            message: "INVALID USERNAME OR PASSWORD"
+            message: constants.INVALIDUSERNAMEPWD
         })
     }
 }

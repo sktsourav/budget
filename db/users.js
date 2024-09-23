@@ -1,4 +1,5 @@
 import { fastify } from "../server.js";
+import { constants } from "../utils/constants.js";
 
 export const fetchAllUsers = async (req, res) => {
     const client = await fastify.pg.connect();
@@ -27,13 +28,12 @@ export const addNewUser = async (req, res, date, id, password) => {
             'INSERT INTO internal.users (id, name, date, username, password) VALUES ($1, $2, $3, $4, $5)', [id, name, date, username, password]
         )
         if (result.rowCount === 1) {
-            console.log("User added successfully");
             res.send({
-                message: "You have successfully signed up",
+                message: constants.SIGNUPSUCCESS
             })
         } else {
             res.send({
-                message: "Sign up failed"
+                message: constants.SIGNUPFAIL
             })
         }
     } catch (err) {
@@ -80,7 +80,7 @@ export const loginUser = (res, username) => {
             } else {
                 res.send({
                     statusCode: 404,
-                    message: "INVALID USERNAME OR PASSWORD"
+                    message: constants.INVALIDUSERNAMEPWD
                 })
             }
 
@@ -103,12 +103,12 @@ export const logout = async (res, sessionId, date) => {
         )
         if (result.rowCount == 1) {
             res.send({
-                msg: "LOGOUT SUCCESSFULL"
+                msg: constants.LOGOUT
             })
         }
     } catch (error) {
         res.send({
-            msg: "SOMETHING WENT WRONG",
+            msg: constants.SOMETHING_WENT_WRONG,
             errors: error.stack
         })
     } finally {
@@ -158,7 +158,6 @@ export const recordloginSession = (res, username, id, sessionId, loginTime, toke
                 'INSERT INTO internal.usersession (username, id, sessionid, logintime, token, activesession) VALUES ($1, $2, $3, $4, $5, $6)', [username, id, sessionId, loginTime, token, true]
             )
             if (result.rowCount === 1) {
-                console.log("Session active");
                 resolve(true)
             } else {
                 reject(false)
