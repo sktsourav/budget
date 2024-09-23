@@ -1,6 +1,7 @@
 import { fetchAllUsers, addNewUser, getUser, checkForDuplicateUsername, checkforDuplicateId, loginUser, recordloginSession, checkforDuplicateSessionId } from "../db/users.js";
 import { generateId } from "../helper/index.js"
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken"
 const saltRounds = 10;
 
 export const fetchAllUsersController = (req, res) => {
@@ -59,8 +60,12 @@ export const loginController = async (req, res) => {
 
 const verifyUserCredential = async (res, inputPassword, userDetails) => {
     const match = await bcrypt.compare(inputPassword, userDetails.password);
-    const token = "eyJhbGciOiJIUcCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3IiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwp_adQssw5c"
     if (match === true) {
+        const token = await jwt.sign({
+            "username": userDetails.username,
+            "name": userDetails.name
+        }, 'ABCXYZSECRETS', { expiresIn: 60 * 60, algorithm: "HS256" });
+
         const sessionId = "SESSION" + await generateId(checkforDuplicateSessionId, 100000000000);
         await recordloginSession(res, userDetails.username, userDetails.id, sessionId, new Date(), token)
         res.send({
