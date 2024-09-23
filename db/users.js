@@ -94,6 +94,28 @@ export const loginUser = (res, username) => {
     })
 }
 
+export const logout = async (res, sessionId, date) => {
+    const client = await fastify.pg.connect();
+    try {
+        const result = await client.query(
+            'update internal.usersession set activesession=$1, logouttime=$2 where sessionid=$3',
+            [false, date, sessionId]
+        )
+        if (result.rowCount == 1) {
+            res.send({
+                msg: "LOGOUT SUCCESSFULL"
+            })
+        }
+    } catch (error) {
+        res.send({
+            msg: "SOMETHING WENT WRONG",
+            errors: error.stack
+        })
+    } finally {
+        client.release();
+    }
+}
+
 export const checkForDuplicateUsername = (username) => {
     return new Promise(async (resolve, reject) => {
         const client = await fastify.pg.connect();

@@ -1,4 +1,4 @@
-import { fetchAllUsers, addNewUser, getUser, checkForDuplicateUsername, checkforDuplicateId, loginUser, recordloginSession, checkforDuplicateSessionId } from "../db/users.js";
+import { fetchAllUsers, addNewUser, getUser, checkForDuplicateUsername, checkforDuplicateId, loginUser, recordloginSession, checkforDuplicateSessionId, logout } from "../db/users.js";
 import { generateId } from "../helper/index.js"
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
@@ -76,6 +76,18 @@ const verifyUserCredential = async (res, inputPassword, userDetails) => {
         res.send({
             statusCode: 401,
             message: "INVALID USERNAME OR PASSWORD"
+        })
+    }
+}
+
+export const logoutController = (req, res) => {
+    try {
+        const date = new Date();
+        const {sessionId} = req.body
+        logout(res, sessionId, date)
+    } catch (error) {
+        res.send({
+            error: error
         })
     }
 }
