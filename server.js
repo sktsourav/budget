@@ -1,11 +1,17 @@
 import Fastify from 'fastify';
 import routes from './routes.js';
 import fastifyPostgress from "@fastify/postgres";
+import fastifyCors from '@fastify/cors';
 
 export const fastify = Fastify({
     logger: true
 })
 
+
+fastify.register(fastifyCors, {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'OPTIONs']
+})
 fastify.register(routes)
 fastify.register(fastifyPostgress, {
     connectionString: 'postgres://postgres:India@123@localhost:5432/budget'
